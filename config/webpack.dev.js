@@ -63,12 +63,12 @@ module.exports = {
           },
           // this matches plain `<style>` or `<style scoped>`
           {
-            test: /\/vue\//,
+            resourceQuery: /vue/,
             use: [
               {
-                loader: 'style-loader',
+                loader:'vue-style-loader',
                 options: {
-                  insert: 'frankenstein-header-wrapper'
+                  shadowMode: true
                 }
               },
               {
@@ -77,6 +77,45 @@ module.exports = {
                   localIdentName: '[local]_[hash:base64:5]'
                 }
               }
+            ]
+          },
+          // Now all global styles
+          {
+            oneOf: [
+              {
+                issuer: /Header/,
+                use: [
+                  {
+                    loader: 'style-loader',
+                    options: {
+                      insert: 'frankenstein-header-wrapper'
+                    }
+                  },
+                  {
+                    loader: 'css-loader',
+                    options: {
+                      localIdentName: '[local]_[hash:base64:5]'
+                    }
+                  },
+                ]
+              },
+              {
+                issuer: /Listing/,
+                use: [
+                  {
+                    loader: 'style-loader',
+                    options: {
+                      insert: 'frankenstein-listing-wrapper'
+                    }
+                  },
+                  {
+                    loader: 'css-loader',
+                    options: {
+                      localIdentName: '[local]_[hash:base64:5]'
+                    }
+                  },
+                ]
+              },
             ]
           },
         ]
