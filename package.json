@@ -11,10 +11,11 @@
     "handlebars": "~2.0.0",
     "html-loader": "^0.5.5",
     "jquery": "~2.1.1",
-    "to-string-loader": "^1.1.5",
+    "style-loader": "^1.0.0",
     "todomvc-app-css": "^2.1.0",
     "todomvc-common": "~1.0.1",
-    "vue-loader": "^15.7.0"
+    "vue-loader": "^15.7.0",
+    "vue-style-loader": "^4.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.4.4",

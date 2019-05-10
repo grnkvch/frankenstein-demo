@@ -1,4 +1,3 @@
-const path = require('path');
 const webpack = require('webpack');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
@@ -26,6 +25,9 @@ module.exports = {
       {
         test: /\.vue$/,
         loader: 'vue-loader',
+        options: {
+          shadowMode: true
+        }
       },
       {
         test: /\.js$/,
@@ -39,12 +41,45 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: {
-          loader: 'css-loader',
-          options: {
-            modules: true
-          }
-        }
+        oneOf: [
+          // this matches `<style module>`
+          {
+            resourceQuery: /module/,
+            use: [
+              {
+                loader:'vue-style-loader',
+                options: {
+                  shadowMode: true
+                }
+              },
+              {
+                loader: 'css-loader',
+                options: {
+                  modules: true,
+                  localIdentName: '[local]_[hash:base64:5]'
+                }
+              }
+            ]
+          },
+          // this matches plain `<style>` or `<style scoped>`
+          {
+            test: /\/vue\//,
+            use: [
+              {
+                loader: 'style-loader',
+                options: {
+                  insert: 'frankenstein-header-wrapper'
+                }
+              },
+              {
+                loader: 'css-loader',
+                options: {
+                  localIdentName: '[local]_[hash:base64:5]'
+                }
+              }
+            ]
+          },
+        ]
       },
       {
         test: /\.(jpg|png|svg|webp)$/,
@@ -55,7 +90,7 @@ module.exports = {
               name: '[name].[ext]',
               publicPath: (url, resourcePath, context) => {
                 if (/vue/.test(resourcePath)) {
-                  return `../vue/public/${url}`;
+                  return `vue/public/${url}`;
                 }
               },
             }
