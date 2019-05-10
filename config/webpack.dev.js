@@ -1,21 +1,32 @@
-const path = require("path");
-const webpack = require("webpack");
+const path = require('path');
+const webpack = require('webpack');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 module.exports = {
   entry: {
-    app: "./js/app.js"
+    'app': './js/app.js',
+    'frankenstein': [
+      '@babel/runtime/regenerator',
+      '@babel/register',
+      '@webcomponents/webcomponentsjs/webcomponents-loader.js',
+      './frankenstein-wrappers/index.js'
+    ],
   },
-  mode: "development",
+  mode: 'development',
   devServer: {
-    contentBase: "./",
+    contentBase: './',
     overlay: true,
     stats: {
       colors: true
     }
   },
-  devtool: "source-map",
+  devtool: 'source-map',
   module: {
     rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+      },
       {
         test: /\.js$/,
         exclude: /node_modules\/(?!(@polymer|lit-element|lit-html)\/).*/,
@@ -24,28 +35,50 @@ module.exports = {
           // to be transpiled to es5.
           /node_modules(?:\/|\\)lit-element|lit-html/
         ],
-        loader: "babel-loader"
+        loader: 'babel-loader'
       },
       {
         test: /\.css$/,
-        loader: "css-loader"
+        use: {
+          loader: 'css-loader',
+          options: {
+            modules: true
+          }
+        }
       },
       {
         test: /\.(jpg|png|svg|webp)$/,
-        loader: "file-loader"
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+              publicPath: (url, resourcePath, context) => {
+                if (/vue/.test(resourcePath)) {
+                  return `../vue/public/${url}`;
+                }
+              },
+            }
+          }
+        ]
       },
       {
         test: /\.html$/,
-        loader: "html-loader"
-      }
+        use: [
+          {
+            loader: 'html-loader'
+          }
+        ]
+      },
     ]
   },
   plugins: [
     new webpack.DefinePlugin({
-      "process.env": {
-        NODE_ENV: JSON.stringify("development")
+      'process.env': {
+        NODE_ENV: JSON.stringify('development')
       }
     }),
-    new webpack.HotModuleReplacementPlugin()
+    new webpack.HotModuleReplacementPlugin(),
+    new VueLoaderPlugin()
   ]
 };
