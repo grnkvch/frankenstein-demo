@@ -1,0 +1,4 @@
+[submodule "react"]
+	path = react
+	url = git@gitlab.com:mishunov/frankenstein-todomvc.git
+	branch = react
