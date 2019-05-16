@@ -1,3 +1,5 @@
+import retargetEvents from "./react-event-retargeting";
+
 // eslint-disable-next-line
 import React from "../../react/node_modules/react";
 /* eslint-disable */
@@ -49,6 +51,7 @@ class FrankensteinWrapper extends HTMLElement {
       </StyleSheetManager>,
       appWrapper
     );
+    retargetEvents(this.shadowRoot);
   }
 }
 
