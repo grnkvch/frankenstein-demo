@@ -1,4 +1,7 @@
 /*global jQuery, Handlebars, Router */
+
+import todoStorage from "./storage";
+
 jQuery(function ($) {
 	'use strict';
 
@@ -11,36 +14,23 @@ jQuery(function ($) {
 
 	var util = {
 		uuid: function () {
-			/*jshint bitwise:false */
-			var i, random;
-			var uuid = '';
-
-			for (i = 0; i < 32; i++) {
-				random = Math.random() * 16 | 0;
-				if (i === 8 || i === 12 || i === 16 || i === 20) {
-					uuid += '-';
-				}
-				uuid += (i === 12 ? 4 : (i === 16 ? (random & 3 | 8) : random)).toString(16);
-			}
-
-			return uuid;
+			return todoStorage.generateid(5);
 		},
 		pluralize: function (count, word) {
 			return count === 1 ? word : word + 's';
 		},
 		store: function (namespace, data) {
 			if (arguments.length > 1) {
-				return localStorage.setItem(namespace, JSON.stringify(data));
+				todoStorage.save(data);
 			} else {
-				var store = localStorage.getItem(namespace);
-				return (store && JSON.parse(store)) || [];
+				return todoStorage.fetch();
 			}
 		}
 	};
 
 	var App = {
 		init: function () {
-			this.todos = util.store('frankenstein');
+			this.fetchStore();
 			this.todoTemplate = Handlebars.compile($('#todo-template').html());
 			this.footerTemplate = Handlebars.compile($('#footer-template').html());
 			this.bindEvents();
@@ -57,11 +47,23 @@ jQuery(function ($) {
 			$('.toggle-all').on('change', this.toggleAll.bind(this));
 			$('.footer').on('click', '.clear-completed', this.destroyCompleted.bind(this));
 			$('.todo-list')
-				.on('change', '.toggle', this.toggle.bind(this))
-				.on('dblclick', 'label', this.editingMode.bind(this))
-				.on('keyup', '.edit', this.editKeyup.bind(this))
-				.on('focusout', '.edit', this.update.bind(this))
-				.on('click', '.destroy', this.destroy.bind(this));
+			.on('change', '.toggle', this.toggle.bind(this))
+			.on('dblclick', 'label', this.editingMode.bind(this))
+			.on('keyup', '.edit', this.editKeyup.bind(this))
+			.on('focusout', '.edit', this.update.bind(this))
+			.on('click', '.destroy', this.destroy.bind(this));
+
+			document.addEventListener('store-update', this.updateFromStore.bind(this));
+		},
+		updateFromStore: function() {
+			this.fetchStore();
+			this.render();
+		},
+		fetchStore: function() {
+			this.todos = util.store('frankenstein');
+		},
+		updateStore: function() {
+			util.store('frankenstein', this.todos);
 		},
 		render: function () {
 			var todos = this.getFilteredTodos();
@@ -70,7 +72,6 @@ jQuery(function ($) {
 			$('.toggle-all').prop('checked', this.getActiveTodos().length === 0);
 			this.renderFooter();
 			$('.new-todo').focus();
-			util.store('frankenstein', this.todos);
 		},
 		renderFooter: function () {
 			var todoCount = this.todos.length;
@@ -92,6 +93,7 @@ jQuery(function ($) {
 			});
 
 			this.render();
+			this.updateStore();
 		},
 		getActiveTodos: function () {
 			return this.todos.filter(function (todo) {
@@ -117,6 +119,7 @@ jQuery(function ($) {
 		destroyCompleted: function () {
 			this.todos = this.getActiveTodos();
 			this.render();
+			this.updateStore();
 		},
 		// accepts an element from inside the `.item` div and
 		// returns the corresponding index in the `todos` array
@@ -139,20 +142,22 @@ jQuery(function ($) {
 				return;
 			}
 
-			this.todos.push({
+			this.todos.unshift({
 				id: util.uuid(),
-				title: val,
+				text: val,
 				completed: false
 			});
 
 			$input.val('');
 
 			this.render();
+			this.updateStore();
 		},
 		toggle: function (e) {
 			var i = this.getIndexFromEl(e.target);
 			this.todos[i].completed = !this.todos[i].completed;
 			this.render();
+			this.updateStore();
 		},
 		editingMode: function (e) {
 			var $input = $(e.target).closest('li').addClass('editing').find('.edit');
@@ -175,21 +180,23 @@ jQuery(function ($) {
 			var el = e.target;
 			var $el = $(el);
 			var val = $el.val().trim();
-			
+
 			if ($el.data('abort')) {
 				$el.data('abort', false);
 			} else if (!val) {
 				this.destroy(e);
 				return;
 			} else {
-				this.todos[this.getIndexFromEl(el)].title = val;
+				this.todos[this.getIndexFromEl(el)].text = val;
 			}
 
 			this.render();
+			this.updateStore();
 		},
 		destroy: function (e) {
 			this.todos.splice(this.getIndexFromEl(e.target), 1);
 			this.render();
+			this.updateStore();
 		}
 	};
 
