@@ -1,3 +1,4 @@
+const path = require('path');
 const webpack = require("webpack");
 
 module.exports = {
@@ -48,20 +49,41 @@ module.exports = {
           // this matches stylesheets coming from /react/ subfolder
           {
             test: /\/react\//,
-            use: [
+            oneOf: [
               {
-                loader: 'style-loader',
-                options: {
-                  injectType: 'singletonStyleTag',
-                  insert: 'frankenstein-header-wrapper'
-                }
+                issuer: /MainSection/,
+                use: [
+                  {
+                    loader: 'style-loader',
+                    options: {
+                      insert: 'frankenstein-mainsection-wrapper'
+                    }
+                  },
+                  {
+                    loader: 'css-loader',
+                    options: {
+                      localIdentName: '[local]_[hash:base64:5]'
+                    }
+                  },
+                ]
               },
               {
-                loader: 'css-loader',
-                options: {
-                  localIdentName: '[local]_[hash:base64:5]'
-                }
-              }
+                issuer: /Header/,
+                use: [
+                  {
+                    loader: 'style-loader',
+                    options: {
+                      insert: 'frankenstein-header-wrapper'
+                    }
+                  },
+                  {
+                    loader: 'css-loader',
+                    options: {
+                      localIdentName: '[local]_[hash:base64:5]'
+                    }
+                  },
+                ]
+              },
             ]
           },
           {
