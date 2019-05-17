@@ -26,23 +26,60 @@ module.exports = {
         loader: "babel-loader"
       },
       {
-        test: /\.css$/,
-        use: {
-          loader: 'css-loader',
-          options: {
-            modules: true
-          }
-        }
-      },
-      {
         test: /\.(jpg|png|svg|webp)$/,
         use: [
           {
             loader: "file-loader",
             options: {
-              name: "images/[name].[ext]"
+              name: "images/[name].[ext]",
+              publicPath: (url, resourcePath, context) => {
+                if (/react/.test(resourcePath)) {
+                  return `react/public/${url}`;
+                }
+              },
+
             }
           }
+        ]
+      },
+      {
+        test: /\.css$/,
+        oneOf: [
+          {
+            test: /\.module\.css$/,
+            use: [
+              {
+                loader: 'style-loader',
+                options: {
+                  insert: 'frankenstein-header-wrapper'
+                }
+              },
+              {
+                loader: 'css-loader',
+                options: {
+                  modules: true,
+                  localIdentName: '[local]_[hash:base64:5]'
+                }
+              }
+            ]
+          },
+          {
+            include: /\/react\//,
+            use: [
+              {
+                loader: 'style-loader',
+                options: {
+                  insert: 'frankenstein-header-wrapper'
+                }
+              },
+              {
+                loader: 'css-loader',
+                options: {
+                  localIdentName: '[local]_[hash:base64:5]'
+                }
+              }
+            ]
+          },
         ]
       },
       {
