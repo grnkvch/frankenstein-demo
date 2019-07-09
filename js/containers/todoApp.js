@@ -4,10 +4,7 @@ const todoApp = () => ({
   template: `
     <div>
       <section class="todoapp">
-        <header class="header">
-          <h1>todos</h1>
-          <create-todo-form on-add="todoApp.handleAdd(todo)"></create-todo-form>
-        </header>
+      <frankenstein-header-wrapper></frankenstein-header-wrapper>
 
         <section class="main">
           <todo-list todos="todoApp._filteredTodos"
