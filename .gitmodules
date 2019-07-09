@@ -1,0 +1,4 @@
+[submodule "vue"]
+	path = vue
+	url = git@gitlab.com:mishunov/frankenstein-todomvc.git
+	branch = vue
