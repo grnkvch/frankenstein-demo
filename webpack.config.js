@@ -1,3 +1,4 @@
+const path = require('path');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 module.exports = {
@@ -74,6 +75,10 @@ module.exports = {
           },
           {
             use: [
+              {
+                loader: path.resolve("./config/webpack-loaders/shadow-css-loader.js")
+              },
+              'to-string-loader',
               'css-loader'
             ]
           }
