@@ -5,20 +5,7 @@ const todoApp = () => ({
     <div>
       <section class="todoapp">
         <frankenstein-header-wrapper></frankenstein-header-wrapper>
-
-        <section class="main">
-          <todo-list todos="todoApp._filteredTodos"
-                on-update="todoApp.handleUpdate(todo)"
-                on-save="todoApp.handleSave(todo)"
-                on-destroy="todoApp.handleDestroy(todo)">
-          </todo-list>
-        </section>
-        <footer class="footer">
-          <todo-count todos="todoApp._activeTodos"></todo-count>
-          <todo-filters types="['all', 'active', 'completed']"
-                        selected="todoApp.selectedFilter"
-                        on-filter="todoApp.updateFilter(filter)"></todo-filters>
-        </footer>
+        <frankenstein-listing-wrapper></frankenstein-listing-wrapper>
       </section>
       <footer class="info">
         <p>Double-click to edit a todo</p>
