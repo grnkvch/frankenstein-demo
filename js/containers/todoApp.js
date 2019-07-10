@@ -4,7 +4,7 @@ const todoApp = () => ({
   template: `
     <div>
       <section class="todoapp">
-      <frankenstein-header-wrapper></frankenstein-header-wrapper>
+        <frankenstein-header-wrapper></frankenstein-header-wrapper>
 
         <section class="main">
           <todo-list todos="todoApp._filteredTodos"
@@ -76,10 +76,27 @@ const todoApp = () => ({
       this.selectedFilter = filter;
       this.updateState();
     }
+
+    updateTodos() {
+      this._todos = this.todoService.all();
+      this.updateState();
+    }
   },
   restrict: 'E',
   bindToController: true,
-  controllerAs: 'todoApp'
+  controllerAs: 'todoApp',
+  link: function(scope, elem, attr, ctrl) {
+    document.addEventListener('store-update', storeUpdateHandler, false);
+    scope.$on('$destroy', function() {
+      document.removeEventListener('store-update', storeUpdateHandler);
+    });
+
+    function storeUpdateHandler() {
+      _.defer(function() {
+        scope.$apply(ctrl.updateTodos.bind(ctrl));
+      });
+    }
+  },
 });
 
 export default todoApp;
