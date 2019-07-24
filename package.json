@@ -1,10 +1,23 @@
 {
   "private": true,
   "dependencies": {
+    "babel-loader": "^8.0.6",
+    "css-loader": "^2.1.1",
     "director": "~1.2.2",
+    "file-loader": "^3.0.1",
     "handlebars": "~2.0.0",
+    "html-loader": "^0.5.5",
     "jquery": "~2.1.1",
+    "to-string-loader": "^1.1.5",
     "todomvc-app-css": "^2.1.0",
     "todomvc-common": "~1.0.1"
+  },
+  "devDependencies": {
+    "webpack": "^4.31.0",
+    "webpack-cli": "^3.3.2",
+    "webpack-dev-server": "^3.7.2"
+  },
+  "scripts": {
+    "start": "webpack-dev-server --config config/webpack.dev.js"
   }
 }
